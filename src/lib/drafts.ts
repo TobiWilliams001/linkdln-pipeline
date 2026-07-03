@@ -10,6 +10,11 @@ export async function getCurrentWeekDrafts(clientId: string, now: Date = new Dat
   });
 }
 
+export async function hasDraftsForWeeklyInput(weeklyInputId: string) {
+  const count = await db.contentPost.count({ where: { weeklyInputId } });
+  return count > 0;
+}
+
 const updateDraftSchema = z.object({
   editedDraft: z.string().optional(),
   approved: z.boolean().optional(),
