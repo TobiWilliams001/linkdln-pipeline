@@ -33,3 +33,18 @@ export async function getCurrentWeekInput(
     where: { clientId_weekNumber_year: { clientId, weekNumber, year } },
   });
 }
+
+export async function getClientsMissingSubmission(now: Date = new Date()) {
+  const { year, weekNumber } = isoWeek(now);
+
+  const clients = await db.client.findMany({
+    include: {
+      users: { where: { role: "CLIENT" } },
+      weeklyInputs: { where: { year, weekNumber } },
+    },
+  });
+
+  return clients.filter(
+    (client) => client.weeklyInputs.length === 0 && client.users.length > 0,
+  );
+}
