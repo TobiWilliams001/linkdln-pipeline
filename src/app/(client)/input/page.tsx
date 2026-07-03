@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { requireClient } from "@/lib/authz";
 import { getCurrentWeekInput, submitWeeklyInput } from "@/lib/weeklyInputs";
+import { hasDraftsForWeeklyInput } from "@/lib/drafts";
+import { generateContentForWeeklyInput } from "@/lib/generateContent";
 
 export default async function WeeklyInputPage() {
   const session = await requireClient();
@@ -10,12 +12,21 @@ export default async function WeeklyInputPage() {
 
   async function save(formData: FormData) {
     "use server";
-    await submitWeeklyInput(clientId, {
+    const weeklyInput = await submitWeeklyInput(clientId, {
       whatHappened: formData.get("whatHappened")?.toString() ?? "",
       clientSituation: formData.get("clientSituation")?.toString() ?? "",
       questionAsked: formData.get("questionAsked")?.toString() ?? "",
       industryObs: formData.get("industryObs")?.toString() ?? "",
     });
+
+    // Only generate once per week - resubmitting to edit an earlier answer
+    // must not create a second, duplicate batch of drafts.
+    const alreadyGenerated = await hasDraftsForWeeklyInput(weeklyInput.id);
+    if (!alreadyGenerated) {
+      await generateContentForWeeklyInput(weeklyInput.id);
+      redirect("/drafts");
+    }
+
     redirect("/input?saved=1");
   }
 
