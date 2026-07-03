@@ -13,6 +13,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
+    async signIn({ user }) {
+      if (!user.email) return false;
+      // No self-serve signup: only emails already provisioned by an admin
+      // (the seeded admin, or a client the admin has invited) may sign in.
+      const existing = await db.user.findUnique({ where: { email: user.email } });
+      return existing !== null;
+    },
     session({ session, user }) {
       session.user.role = user.role;
       session.user.clientId = user.clientId;
