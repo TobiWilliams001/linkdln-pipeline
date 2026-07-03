@@ -10,4 +10,82 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  CLIENT
+}
+
+enum ContentType {
+  INSIGHT
+  STORY
+  PROCESS
+  OPINION
+  RESULT
+  OBSERVATION
+}
+
+model Client {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  name            String
+  voiceProfile    String?
+  coreBelief      String?
+  icpPain         String?
+  originStory     String?
+  clientResults   Json?
+  strongOpinions  Json?
+  contentExamples String[]
+  postingCadence  Int      @default(4)
+  createdAt       DateTime @default(now())
+
+  users        User[]
+  weeklyInputs WeeklyInput[]
+  contentPosts ContentPost[]
+}
+
+model User {
+  id       String  @id @default(cuid())
+  email    String  @unique
+  role     Role
+  clientId String?
+  client   Client? @relation(fields: [clientId], references: [id])
+}
+
+model WeeklyInput {
+  id              String   @id @default(cuid())
+  clientId        String
+  client          Client   @relation(fields: [clientId], references: [id])
+  weekNumber      Int
+  year            Int
+  whatHappened    String?
+  clientSituation String?
+  questionAsked   String?
+  industryObs     String?
+  voiceNoteUrl    String?
+  submittedAt     DateTime @default(now())
+
+  contentPosts ContentPost[]
+
+  @@unique([clientId, weekNumber, year])
+}
+
+model ContentPost {
+  id             String      @id @default(cuid())
+  clientId       String
+  client         Client      @relation(fields: [clientId], references: [id])
+  weeklyInputId  String
+  weeklyInput    WeeklyInput @relation(fields: [weeklyInputId], references: [id])
+  weekNumber     Int
+  year           Int
+  contentType    ContentType
+  generatedDraft String
+  editedDraft    String?
+  approved       Boolean     @default(false)
+  posted         Boolean     @default(false)
+  postDate       DateTime?
+  linkedinUrl    String?
+  createdAt      DateTime    @default(now())
 }
