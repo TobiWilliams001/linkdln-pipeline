@@ -1,6 +1,6 @@
 import { revalidatePath } from "next/cache";
 import { requireClient } from "@/lib/authz";
-import { getCurrentWeekDrafts, updateDraft } from "@/lib/drafts";
+import { getCurrentWeekDrafts, markPosted, updateDraft } from "@/lib/drafts";
 
 const CONTENT_TYPE_LABELS: Record<string, string> = {
   INSIGHT: "Insight",
@@ -35,6 +35,16 @@ export default async function DraftsPage() {
     revalidatePath("/drafts");
   }
 
+  async function markAsPosted(formData: FormData) {
+    "use server";
+    const postId = formData.get("postId")?.toString();
+    if (!postId) return;
+    await markPosted(postId, clientId, {
+      linkedinUrl: formData.get("linkedinUrl")?.toString() ?? "",
+    });
+    revalidatePath("/drafts");
+  }
+
   return (
     <main className="mx-auto max-w-2xl px-4 py-10">
       <h1 className="mb-1 text-xl font-semibold">This week&apos;s drafts</h1>
@@ -59,7 +69,11 @@ export default async function DraftsPage() {
                 <span className="text-xs font-medium uppercase tracking-wide text-gray-500">
                   {CONTENT_TYPE_LABELS[draft.contentType] ?? draft.contentType}
                 </span>
-                {draft.approved ? (
+                {draft.posted ? (
+                  <span className="text-xs font-medium text-blue-700">
+                    Posted
+                  </span>
+                ) : draft.approved ? (
                   <span className="text-xs font-medium text-green-700">
                     Approved
                   </span>
@@ -92,6 +106,24 @@ export default async function DraftsPage() {
                     className="rounded bg-black px-3 py-2 text-sm text-white"
                   >
                     Approve
+                  </button>
+                </form>
+              )}
+
+              {draft.approved && !draft.posted && (
+                <form action={markAsPosted} className="mt-2 flex gap-2">
+                  <input type="hidden" name="postId" value={draft.id} />
+                  <input
+                    type="url"
+                    name="linkedinUrl"
+                    placeholder="LinkedIn post URL (optional)"
+                    className="flex-1 rounded border border-gray-300 px-3 py-2 text-sm"
+                  />
+                  <button
+                    type="submit"
+                    className="rounded border border-gray-300 px-3 py-2 text-sm"
+                  >
+                    Mark as posted
                   </button>
                 </form>
               )}
