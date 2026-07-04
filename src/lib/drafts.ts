@@ -30,3 +30,28 @@ export async function updateDraft(postId: string, clientId: string, input: unkno
 
   return db.contentPost.update({ where: { id: postId }, data });
 }
+
+const markPostedSchema = z.object({
+  linkedinUrl: z.string().url().optional().or(z.literal("")),
+});
+
+export async function markPosted(postId: string, clientId: string, input: unknown) {
+  const { linkedinUrl } = markPostedSchema.parse(input);
+
+  const post = await db.contentPost.findUnique({ where: { id: postId } });
+  if (!post || post.clientId !== clientId) {
+    throw new Error("Draft not found for this client");
+  }
+  if (!post.approved) {
+    throw new Error("Cannot mark an unapproved draft as posted");
+  }
+
+  return db.contentPost.update({
+    where: { id: postId },
+    data: {
+      posted: true,
+      postDate: new Date(),
+      linkedinUrl: linkedinUrl || undefined,
+    },
+  });
+}
