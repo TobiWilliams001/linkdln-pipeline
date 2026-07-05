@@ -1,5 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import { getClient, updateClientOnboarding } from "@/lib/clients";
+import { uploadVoiceNote } from "@/lib/blob";
+import { transcribeAudio } from "@/lib/transcribe";
 
 function parseLines(value: FormDataEntryValue | null) {
   if (typeof value !== "string") return [];
@@ -28,8 +30,19 @@ export default async function ClientOnboardingPage({
       },
     );
 
+    let transcript: string | undefined;
+    const voiceNote = formData.get("voiceNote");
+    if (voiceNote instanceof File && voiceNote.size > 0) {
+      const voiceNoteUrl = await uploadVoiceNote(voiceNote);
+      transcript = await transcribeAudio(voiceNoteUrl);
+    }
+
+    const typedVoiceProfile = formData.get("voiceProfile")?.toString() ?? "";
+
     await updateClientOnboarding(id, {
-      voiceProfile: formData.get("voiceProfile")?.toString() ?? "",
+      // Voice note is an alternative to typing/pasting - only used when the
+      // voice profile field was left blank.
+      voiceProfile: typedVoiceProfile || transcript || "",
       coreBelief: formData.get("coreBelief")?.toString() ?? "",
       icpPain: formData.get("icpPain")?.toString() ?? "",
       originStory: formData.get("originStory")?.toString() ?? "",
@@ -72,6 +85,16 @@ export default async function ClientOnboardingPage({
             rows={6}
             defaultValue={client.voiceProfile ?? ""}
             className="rounded border border-gray-300 px-3 py-2 text-sm"
+          />
+          <span className="text-xs text-gray-500">
+            Or upload the calibration call recording instead of pasting a
+            transcript.
+          </span>
+          <input
+            type="file"
+            name="voiceNote"
+            accept="audio/*"
+            className="text-sm"
           />
         </label>
 
