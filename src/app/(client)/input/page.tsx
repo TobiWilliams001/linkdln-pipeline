@@ -3,6 +3,8 @@ import { requireClient } from "@/lib/authz";
 import { getCurrentWeekInput, submitWeeklyInput } from "@/lib/weeklyInputs";
 import { hasDraftsForWeeklyInput } from "@/lib/drafts";
 import { generateContentForWeeklyInput } from "@/lib/generateContent";
+import { uploadVoiceNote } from "@/lib/blob";
+import { transcribeAudio } from "@/lib/transcribe";
 
 export default async function WeeklyInputPage() {
   const session = await requireClient();
@@ -12,11 +14,25 @@ export default async function WeeklyInputPage() {
 
   async function save(formData: FormData) {
     "use server";
+
+    let voiceNoteUrl: string | undefined;
+    let transcript: string | undefined;
+    const voiceNote = formData.get("voiceNote");
+    if (voiceNote instanceof File && voiceNote.size > 0) {
+      voiceNoteUrl = await uploadVoiceNote(voiceNote);
+      transcript = await transcribeAudio(voiceNoteUrl);
+    }
+
+    const typedWhatHappened = formData.get("whatHappened")?.toString() ?? "";
+
     const weeklyInput = await submitWeeklyInput(clientId, {
-      whatHappened: formData.get("whatHappened")?.toString() ?? "",
+      // Voice note is an alternative to typing, not additive - only used
+      // when the "what happened" field was left blank.
+      whatHappened: typedWhatHappened || transcript || "",
       clientSituation: formData.get("clientSituation")?.toString() ?? "",
       questionAsked: formData.get("questionAsked")?.toString() ?? "",
       industryObs: formData.get("industryObs")?.toString() ?? "",
+      voiceNoteUrl,
     });
 
     // Only generate once per week - resubmitting to edit an earlier answer
@@ -48,6 +64,15 @@ export default async function WeeklyInputPage() {
             rows={3}
             defaultValue={existing?.whatHappened ?? ""}
             className="rounded border border-gray-300 px-3 py-2 text-sm"
+          />
+          <span className="text-xs text-gray-500">
+            Or record a voice note below instead of typing this one.
+          </span>
+          <input
+            type="file"
+            name="voiceNote"
+            accept="audio/*"
+            className="text-sm"
           />
         </label>
 
