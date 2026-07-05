@@ -7,6 +7,7 @@ const submitSchema = z.object({
   clientSituation: z.string().optional(),
   questionAsked: z.string().optional(),
   industryObs: z.string().optional(),
+  voiceNoteUrl: z.string().url().optional(),
 });
 
 export async function submitWeeklyInput(
