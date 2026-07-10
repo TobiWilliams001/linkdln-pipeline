@@ -1,19 +1,26 @@
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { db } from "@/lib/db";
 import { contentMix, type PastPost } from "@/lib/contentMix";
 import { promptBuilder } from "@/lib/promptBuilder";
 
-const anthropic = new Anthropic();
-
-function extractText(message: Anthropic.Message): string {
-  const textBlock = message.content.find((block) => block.type === "text");
-  if (!textBlock || textBlock.type !== "text") {
-    throw new Error("Claude response contained no text block");
+function extractText(completion: OpenAI.Chat.Completions.ChatCompletion): string {
+  const text = completion.choices[0]?.message?.content;
+  if (!text) {
+    throw new Error("OpenRouter response contained no text");
   }
-  return textBlock.text;
+  return text;
 }
 
 export async function generateContentForWeeklyInput(weeklyInputId: string) {
+  // Instantiated lazily, not at module scope: the OpenAI constructor throws
+  // immediately if the API key is missing, which would break the build (and
+  // any route that imports this module) before a real key is configured -
+  // same failure mode we hit with Resend in email.ts.
+  const openrouter = new OpenAI({
+    apiKey: process.env.OPENROUTER_API_KEY,
+    baseURL: "https://openrouter.ai/api/v1",
+  });
+
   const weeklyInput = await db.weeklyInput.findUniqueOrThrow({
     where: { id: weeklyInputId },
     include: { client: true },
@@ -61,14 +68,13 @@ export async function generateContentForWeeklyInput(weeklyInputId: string) {
     );
 
     // eslint-disable-next-line no-await-in-loop
-    const message = await anthropic.messages.create({
-      model: "claude-opus-4-8",
+    const completion = await openrouter.chat.completions.create({
+      model: "anthropic/claude-opus-4.8",
       max_tokens: 1024,
-      thinking: { type: "adaptive" },
       messages: [{ role: "user", content: prompt }],
     });
 
-    const draft = extractText(message);
+    const draft = extractText(completion);
 
     // eslint-disable-next-line no-await-in-loop
     const post = await db.contentPost.create({
