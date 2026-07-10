@@ -5,29 +5,35 @@ export default async function AdminHomePage() {
   const clients = await listClients();
 
   return (
-    <main className="mx-auto max-w-2xl px-4 py-10">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Clients</h1>
+    <main className="mx-auto max-w-2xl px-6 py-10">
+      <div className="mb-8 flex items-center justify-between">
+        <h1 className="text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
+          Clients
+        </h1>
         <Link
           href="/admin/clients/new"
-          className="rounded bg-black px-3 py-2 text-sm text-white"
+          className="h-10 rounded-lg bg-zinc-950 px-4 text-sm font-semibold leading-10 text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200"
         >
           New client
         </Link>
       </div>
 
       {clients.length === 0 ? (
-        <p className="text-sm text-gray-500">No clients yet.</p>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          No clients yet.
+        </p>
       ) : (
         <ul className="flex flex-col gap-2">
           {clients.map((client) => (
             <li key={client.id}>
               <Link
                 href={`/admin/clients/${client.id}`}
-                className="flex items-center justify-between rounded border border-gray-200 px-4 py-3 hover:bg-gray-50"
+                className="flex items-center justify-between rounded-xl border border-zinc-950/10 px-4 py-3 transition-colors hover:bg-zinc-950/5 dark:border-white/10 dark:hover:bg-white/5"
               >
-                <span>{client.name}</span>
-                <span className="text-xs text-gray-500">
+                <span className="text-zinc-950 dark:text-zinc-50">
+                  {client.name}
+                </span>
+                <span className="text-xs text-zinc-500 dark:text-zinc-400">
                   {client._count.weeklyInputs} weekly inputs -{" "}
                   {client._count.contentPosts} posts
                 </span>

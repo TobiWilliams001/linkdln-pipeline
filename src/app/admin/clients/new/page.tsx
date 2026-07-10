@@ -11,19 +11,21 @@ export default function NewClientPage() {
   }
 
   return (
-    <main className="mx-auto max-w-sm px-4 py-10">
-      <h1 className="mb-6 text-xl font-semibold">New client</h1>
+    <main className="mx-auto max-w-sm px-6 py-10">
+      <h1 className="mb-6 text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
+        New client
+      </h1>
       <form action={create} className="flex flex-col gap-3">
         <input
           type="text"
           name="name"
           required
           placeholder="Client name"
-          className="rounded border border-gray-300 px-3 py-2"
+          className="h-11 rounded-lg border border-zinc-950/10 bg-transparent px-3 text-sm text-zinc-950 outline-none placeholder:text-zinc-400 focus:border-zinc-950/30 dark:border-white/15 dark:text-zinc-50 dark:focus:border-white/30"
         />
         <button
           type="submit"
-          className="rounded bg-black px-3 py-2 text-white"
+          className="h-11 rounded-lg bg-zinc-950 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200"
         >
           Create and start onboarding
         </button>
