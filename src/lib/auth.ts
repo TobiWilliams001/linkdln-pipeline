@@ -6,6 +6,11 @@ import { db } from "@/lib/db";
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(db),
   session: { strategy: "database" },
+  trustHost: true,
+  pages: {
+    signIn: "/login",
+    verifyRequest: "/login/verify",
+  },
   providers: [
     Resend({
       apiKey: process.env.RESEND_API_KEY,
