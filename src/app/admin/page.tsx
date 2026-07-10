@@ -5,7 +5,7 @@ export default async function AdminHomePage() {
   const clients = await listClients();
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-10">
+    <main className="mx-auto max-w-2xl px-6 py-12">
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
           Clients
@@ -28,7 +28,7 @@ export default async function AdminHomePage() {
             <li key={client.id}>
               <Link
                 href={`/admin/clients/${client.id}`}
-                className="flex items-center justify-between rounded-xl border border-zinc-950/10 px-4 py-3 transition-colors hover:bg-zinc-950/5 dark:border-white/10 dark:hover:bg-white/5"
+                className="flex items-center justify-between rounded-xl border border-zinc-950/10 px-4 py-3.5 transition-colors hover:bg-zinc-950/2 dark:border-white/10 dark:hover:bg-white/3"
               >
                 <span className="text-zinc-950 dark:text-zinc-50">
                   {client.name}
