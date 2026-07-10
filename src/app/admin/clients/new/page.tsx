@@ -11,7 +11,7 @@ export default function NewClientPage() {
   }
 
   return (
-    <main className="mx-auto max-w-sm px-6 py-10">
+    <main className="mx-auto max-w-sm px-6 py-12">
       <h1 className="mb-6 text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
         New client
       </h1>
