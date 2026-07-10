@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { signIn } from "@/lib/auth";
 
 export default function LoginPage() {
@@ -9,27 +10,42 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-4 px-4">
-      <h1 className="text-xl font-semibold">Sign in</h1>
-      <p className="text-sm text-gray-500">
-        Enter your email. If it&apos;s already set up, we&apos;ll send you a
-        sign-in link.
-      </p>
-      <form action={sendMagicLink} className="flex flex-col gap-3">
-        <input
-          type="email"
-          name="email"
-          required
-          placeholder="you@example.com"
-          className="rounded border border-gray-300 px-3 py-2"
-        />
-        <button
-          type="submit"
-          className="rounded bg-black px-3 py-2 text-white"
+    <div className="flex flex-1 flex-col bg-white dark:bg-black">
+      <header className="mx-auto w-full max-w-5xl px-6 py-6">
+        <Link
+          href="/"
+          className="text-sm font-semibold tracking-tight text-zinc-950 dark:text-zinc-50"
         >
-          Send sign-in link
-        </button>
-      </form>
-    </main>
+          LinkedIn Content Pipeline
+        </Link>
+      </header>
+
+      <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-6 px-6 pb-24">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
+            Sign in
+          </h1>
+          <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+            Enter your email. If your account is set up, we&apos;ll send you a
+            sign-in link.
+          </p>
+        </div>
+        <form action={sendMagicLink} className="flex flex-col gap-3">
+          <input
+            type="email"
+            name="email"
+            required
+            placeholder="you@example.com"
+            className="h-11 rounded-lg border border-zinc-950/10 bg-transparent px-3 text-sm text-zinc-950 outline-none placeholder:text-zinc-400 focus:border-zinc-950/30 dark:border-white/15 dark:text-zinc-50 dark:focus:border-white/30"
+          />
+          <button
+            type="submit"
+            className="h-11 rounded-lg bg-zinc-950 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200"
+          >
+            Send sign-in link
+          </button>
+        </form>
+      </main>
+    </div>
   );
 }
