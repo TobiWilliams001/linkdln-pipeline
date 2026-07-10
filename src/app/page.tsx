@@ -1,8 +1,22 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 
-export default function Home() {
+const highlights = ["Written in your voice", "No blank page", "Ready in minutes"];
+
+export default async function Home() {
+  const session = await auth();
+  if (session?.user) {
+    redirect(session.user.role === "ADMIN" ? "/admin" : "/dashboard");
+  }
+
   return (
-    <div className="flex flex-1 flex-col bg-white dark:bg-black">
+    <div className="relative flex flex-1 flex-col overflow-hidden bg-white dark:bg-black">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 [background:radial-gradient(80%_60%_at_50%_-10%,rgba(0,0,0,0.06),transparent)] dark:[background:radial-gradient(80%_60%_at_50%_-10%,rgba(255,255,255,0.08),transparent)]"
+      />
+
       <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-6">
         <span className="text-sm font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
           LinkedIn Content Pipeline
@@ -15,26 +29,38 @@ export default function Home() {
         </Link>
       </header>
 
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center gap-6 px-6 pb-24">
-        <span className="rounded-full bg-zinc-950/5 px-3 py-1 text-xs font-medium uppercase tracking-wide text-zinc-600 dark:bg-white/10 dark:text-zinc-400">
+      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center gap-7 px-6 pb-32 text-center">
+        <span className="w-fit rounded-full bg-zinc-950/5 px-3 py-1 text-xs font-medium uppercase tracking-wide text-zinc-600 dark:bg-white/10 dark:text-zinc-400">
           For agencies, not just founders
         </span>
-        <h1 className="max-w-2xl text-4xl font-semibold leading-tight tracking-tight text-zinc-950 sm:text-5xl dark:text-zinc-50">
+        <h1 className="max-w-2xl text-5xl font-semibold leading-[1.1] tracking-tight text-zinc-950 sm:text-6xl dark:text-zinc-50">
           Turn ten minutes a week into a month of LinkedIn content.
         </h1>
         <p className="max-w-xl text-lg leading-8 text-zinc-600 dark:text-zinc-400">
           Ready-to-post drafts written in your voice — no ghostwriter on call,
           no blank page.
         </p>
+
+        <div className="mt-1 flex flex-wrap justify-center gap-2">
+          {highlights.map((item) => (
+            <span
+              key={item}
+              className="rounded-full border border-zinc-950/10 px-3 py-1.5 text-xs font-medium text-zinc-600 dark:border-white/10 dark:text-zinc-400"
+            >
+              {item}
+            </span>
+          ))}
+        </div>
+
         <Link
           href="/login"
-          className="mt-2 inline-flex h-12 w-fit items-center justify-center rounded-full bg-zinc-950 px-6 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200"
+          className="mt-3 inline-flex h-12 w-fit items-center justify-center rounded-full bg-zinc-950 px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200"
         >
           Sign in to your workspace
         </Link>
       </main>
 
-      <footer className="mx-auto w-full max-w-5xl px-6 py-8 text-xs text-zinc-500 dark:text-zinc-500">
+      <footer className="mx-auto w-full max-w-5xl border-t border-zinc-950/10 px-6 py-8 text-xs text-zinc-500 dark:border-white/10 dark:text-zinc-500">
         &copy; {new Date().getFullYear()} LinkedIn Content Pipeline
       </footer>
     </div>
