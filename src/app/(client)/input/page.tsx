@@ -46,50 +46,57 @@ export default async function WeeklyInputPage() {
     redirect("/input?saved=1");
   }
 
+  const textareaClass =
+    "rounded-lg border border-zinc-950/10 bg-transparent px-3 py-2 text-sm text-zinc-950 outline-none placeholder:text-zinc-400 focus:border-zinc-950/30 dark:border-white/15 dark:text-zinc-50 dark:focus:border-white/30";
+  const labelClass = "text-sm font-medium text-zinc-950 dark:text-zinc-50";
+  const hintClass = "text-xs text-zinc-500 dark:text-zinc-400";
+
   return (
-    <main className="mx-auto max-w-2xl px-4 py-10">
-      <h1 className="mb-1 text-xl font-semibold">This week&apos;s input</h1>
-      <p className="mb-6 text-sm text-gray-500">
+    <main className="mx-auto max-w-2xl px-6 py-10">
+      <h1 className="mb-1 text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
+        This week&apos;s input
+      </h1>
+      <p className="mb-8 text-sm text-zinc-500 dark:text-zinc-400">
         Four quick questions. Takes about 10 minutes - this is the raw
         material for this week&apos;s posts.
       </p>
 
-      <form action={save} className="flex flex-col gap-5">
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium">
+      <form action={save} className="flex flex-col gap-6">
+        <label className="flex flex-col gap-1.5">
+          <span className={labelClass}>
             What happened this week that was interesting?
           </span>
           <textarea
             name="whatHappened"
             rows={3}
             defaultValue={existing?.whatHappened ?? ""}
-            className="rounded border border-gray-300 px-3 py-2 text-sm"
+            className={textareaClass}
           />
-          <span className="text-xs text-gray-500">
+          <span className={hintClass}>
             Or record a voice note below instead of typing this one.
           </span>
           <input
             type="file"
             name="voiceNote"
             accept="audio/*"
-            className="text-sm"
+            className="text-sm text-zinc-600 file:mr-3 file:rounded-lg file:border-0 file:bg-zinc-950/5 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-zinc-950 dark:text-zinc-400 dark:file:bg-white/10 dark:file:text-zinc-50"
           />
         </label>
 
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium">
+        <label className="flex flex-col gap-1.5">
+          <span className={labelClass}>
             A problem a client brought to you recently - what happened?
           </span>
           <textarea
             name="clientSituation"
             rows={3}
             defaultValue={existing?.clientSituation ?? ""}
-            className="rounded border border-gray-300 px-3 py-2 text-sm"
+            className={textareaClass}
           />
         </label>
 
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium">
+        <label className="flex flex-col gap-1.5">
+          <span className={labelClass}>
             What question did someone ask you that&apos;s worth answering
             publicly?
           </span>
@@ -97,25 +104,25 @@ export default async function WeeklyInputPage() {
             name="questionAsked"
             rows={2}
             defaultValue={existing?.questionAsked ?? ""}
-            className="rounded border border-gray-300 px-3 py-2 text-sm"
+            className={textareaClass}
           />
         </label>
 
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium">
+        <label className="flex flex-col gap-1.5">
+          <span className={labelClass}>
             Anything happening in your industry you have a view on?
           </span>
           <textarea
             name="industryObs"
             rows={2}
             defaultValue={existing?.industryObs ?? ""}
-            className="rounded border border-gray-300 px-3 py-2 text-sm"
+            className={textareaClass}
           />
         </label>
 
         <button
           type="submit"
-          className="rounded bg-black px-3 py-2 text-sm text-white"
+          className="h-11 self-start rounded-lg bg-zinc-950 px-5 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200"
         >
           {existing ? "Update this week's input" : "Submit"}
         </button>

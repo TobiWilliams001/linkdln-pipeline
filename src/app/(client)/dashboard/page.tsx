@@ -24,35 +24,49 @@ export default async function DashboardPage() {
     await getDashboardStats(clientId);
 
   return (
-    <main className="mx-auto max-w-2xl px-4 py-10">
-      <h1 className="mb-6 text-xl font-semibold">This month</h1>
+    <main className="mx-auto max-w-2xl px-6 py-10">
+      <h1 className="mb-6 text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
+        This month
+      </h1>
 
       <div className="mb-8 grid grid-cols-3 gap-3">
-        <div className="rounded border border-gray-200 p-4 text-center">
-          <div className="text-2xl font-semibold">{totalCount}</div>
-          <div className="text-xs text-gray-500">Generated</div>
+        <div className="rounded-xl border border-zinc-950/10 p-4 text-center dark:border-white/10">
+          <div className="text-2xl font-semibold text-zinc-950 dark:text-zinc-50">
+            {totalCount}
+          </div>
+          <div className="text-xs text-zinc-500 dark:text-zinc-400">Generated</div>
         </div>
-        <div className="rounded border border-gray-200 p-4 text-center">
-          <div className="text-2xl font-semibold">{approvedCount}</div>
-          <div className="text-xs text-gray-500">Approved</div>
+        <div className="rounded-xl border border-zinc-950/10 p-4 text-center dark:border-white/10">
+          <div className="text-2xl font-semibold text-zinc-950 dark:text-zinc-50">
+            {approvedCount}
+          </div>
+          <div className="text-xs text-zinc-500 dark:text-zinc-400">Approved</div>
         </div>
-        <div className="rounded border border-gray-200 p-4 text-center">
-          <div className="text-2xl font-semibold">{postedCount}</div>
-          <div className="text-xs text-gray-500">Posted</div>
+        <div className="rounded-xl border border-zinc-950/10 p-4 text-center dark:border-white/10">
+          <div className="text-2xl font-semibold text-zinc-950 dark:text-zinc-50">
+            {postedCount}
+          </div>
+          <div className="text-xs text-zinc-500 dark:text-zinc-400">Posted</div>
         </div>
       </div>
 
       {posts.length === 0 ? (
-        <p className="text-sm text-gray-500">No posts generated yet this month.</p>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          No posts generated yet this month.
+        </p>
       ) : (
         <ul className="flex flex-col gap-2">
           {posts.map((post) => (
             <li
               key={post.id}
-              className="flex items-center justify-between rounded border border-gray-200 px-4 py-3 text-sm"
+              className="flex items-center justify-between rounded-xl border border-zinc-950/10 px-4 py-3 text-sm dark:border-white/10"
             >
-              <span>{CONTENT_TYPE_LABELS[post.contentType] ?? post.contentType}</span>
-              <span className="text-xs text-gray-500">{statusLabel(post)}</span>
+              <span className="text-zinc-950 dark:text-zinc-50">
+                {CONTENT_TYPE_LABELS[post.contentType] ?? post.contentType}
+              </span>
+              <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                {statusLabel(post)}
+              </span>
             </li>
           ))}
         </ul>
