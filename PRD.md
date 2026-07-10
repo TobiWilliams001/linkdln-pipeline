@@ -103,7 +103,7 @@ All of the above is built and working end-to-end on the `main` branch:
 - **Framework:** Next.js 16 (App Router), React 19, TypeScript
 - **Database:** PostgreSQL, accessed via Prisma 7 (`@prisma/adapter-pg`), generated client checked into `src/generated/prisma`
 - **Auth:** NextAuth v5 (beta) with the Prisma adapter — email magic-link login via Resend, session/user/account tables are standard Auth.js models
-- **AI generation:** Anthropic SDK (`claude-opus-4-8`, adaptive thinking) for drafting posts
+- **AI generation:** OpenRouter (OpenAI-compatible API, routed to `anthropic/claude-opus-4.8`) for drafting posts
 - **Transcription:** OpenAI SDK (Whisper) for voice-note-to-text
 - **File storage:** Vercel Blob for uploaded voice notes
 - **Email:** Resend, for magic-link auth and weekly reminder emails
@@ -133,7 +133,7 @@ Two migrations applied so far: `init` and `add_auth_models`.
 | `src/lib/transcribe.ts` | Sends audio to OpenAI Whisper, returns transcript text |
 | `src/lib/contentMix.ts` | Given `postingCadence` + recent post history, picks which `ContentType`s to generate this week, weighting for variety (deprioritizes types used in the last N weeks; upweights Observation/Insight, downweights Result) |
 | `src/lib/promptBuilder.ts` | Assembles the Claude prompt per content type from client profile + weekly input + style rules |
-| `src/lib/generateContent.ts` | Orchestrates: load weekly input → compute mix → build prompt per type → call Claude (`claude-opus-4-8`) → persist each `ContentPost` |
+| `src/lib/generateContent.ts` | Orchestrates: load weekly input → compute mix → build prompt per type → call Claude via OpenRouter (`anthropic/claude-opus-4.8`) → persist each `ContentPost` |
 | `src/lib/drafts.ts`, `src/app/api/drafts/[id]/route.ts` | Draft edit/approve/mark-posted logic; API route re-verifies the draft belongs to the requesting client before mutating |
 | `src/lib/dashboard.ts` | Aggregates monthly counts (generated/approved/posted) for the client dashboard |
 | `src/app/api/cron/weekly-reminder/route.ts` | Finds clients with no `WeeklyInput` for the current ISO week, emails all their users via `src/lib/email.ts` |
@@ -151,12 +151,12 @@ Route-level access control is enforced via `src/lib/authz.ts` (role checks for a
 
 ### 8.5 Environment variables (`.env.example`)
 
-`DATABASE_URL`, `AUTH_SECRET`, `ADMIN_EMAIL` (seeded admin), `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `RESEND_API_KEY` / `RESEND_FROM_EMAIL`, `BLOB_READ_WRITE_TOKEN`, `CRON_SECRET`, `NEXT_PUBLIC_APP_URL`.
+`DATABASE_URL`, `AUTH_SECRET`, `ADMIN_EMAIL` (seeded admin), `OPENROUTER_API_KEY`, `OPENAI_API_KEY`, `RESEND_API_KEY` / `RESEND_FROM_EMAIL`, `BLOB_READ_WRITE_TOKEN`, `CRON_SECRET`, `NEXT_PUBLIC_APP_URL`.
 
 ### 8.6 Known technical gaps
 
 - No end-to-end/integration tests — current test coverage is limited to three pure-logic units (`isoWeek`, `promptBuilder`, `contentMix`); nothing exercises the DB, auth, or API routes.
 - No visible error handling/UI feedback path for failed Blob uploads or failed Whisper transcription in the weekly-input or onboarding forms — needs verification.
-- `src/generated/prisma` (the generated Prisma client) is checked into `src/`, not gitignored into a build artifact location — worth confirming this is intentional.
+- ~~`src/generated/prisma` gitignored, causing Vercel build failures~~ — fixed: `build` script now runs `prisma generate` before `next build`.
 - No agency-wide aggregate queries yet — `dashboard.ts` is scoped to a single client; an agency-wide view would need new queries, not just new UI.
 - Content generation runs sequentially in a loop per post (one Claude call at a time, not parallelized) — fine at current volume, worth revisiting if `postingCadence` or client count grows significantly.
