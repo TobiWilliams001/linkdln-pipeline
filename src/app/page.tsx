@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 
 const highlights = ["Written in your voice", "No blank page", "Ready in minutes"];
@@ -24,9 +23,7 @@ const steps = [
 
 export default async function Home() {
   const session = await auth();
-  if (session?.user) {
-    redirect("/dashboard");
-  }
+  const loggedInHref = session?.user ? "/dashboard" : "/login";
 
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden bg-white dark:bg-black">
@@ -40,10 +37,10 @@ export default async function Home() {
           LinkedIn Content Pipeline
         </span>
         <Link
-          href="/login"
+          href={loggedInHref}
           className="rounded-full border border-zinc-950/10 px-4 py-2 text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-950/5 dark:border-white/15 dark:text-zinc-50 dark:hover:bg-white/10"
         >
-          Sign in
+          {session?.user ? "Go to workspace" : "Sign in"}
         </Link>
       </header>
 
@@ -71,10 +68,10 @@ export default async function Home() {
         </div>
 
         <Link
-          href="/login"
+          href={loggedInHref}
           className="mt-3 inline-flex h-12 w-fit items-center justify-center rounded-full bg-zinc-950 px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200"
         >
-          Get started
+          {session?.user ? "Go to workspace" : "Get started"}
         </Link>
       </main>
 
