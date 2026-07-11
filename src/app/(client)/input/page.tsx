@@ -5,6 +5,7 @@ import { hasDraftsForWeeklyInput } from "@/lib/drafts";
 import { generateContentForWeeklyInput } from "@/lib/generateContent";
 import { uploadVoiceNote } from "@/lib/blob";
 import { transcribeAudio } from "@/lib/transcribe";
+import { SubmitButton } from "@/components/submit-button";
 
 export default async function WeeklyInputPage() {
   const session = await requireClient();
@@ -120,12 +121,12 @@ export default async function WeeklyInputPage() {
           />
         </label>
 
-        <button
-          type="submit"
+        <SubmitButton
+          pendingLabel="Generating your drafts…"
           className="h-11 self-start rounded-lg bg-zinc-950 px-5 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200"
         >
           {existing ? "Update this week's input" : "Submit"}
-        </button>
+        </SubmitButton>
       </form>
     </main>
   );

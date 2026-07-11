@@ -1,6 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { requireClient } from "@/lib/authz";
 import { getCurrentWeekDrafts, markPosted, updateDraft } from "@/lib/drafts";
+import { SubmitButton } from "@/components/submit-button";
 
 const CONTENT_TYPE_LABELS: Record<string, string> = {
   INSIGHT: "Insight",
@@ -95,24 +96,24 @@ export default async function DraftsPage() {
                   className="rounded-lg border border-zinc-950/10 bg-transparent px-3 py-2 text-sm text-zinc-950 outline-none focus:border-zinc-950/30 dark:border-white/15 dark:text-zinc-50 dark:focus:border-white/30"
                 />
                 <div className="flex gap-2">
-                  <button
-                    type="submit"
+                  <SubmitButton
+                    pendingLabel="Saving…"
                     className="h-10 rounded-lg border border-zinc-950/10 px-4 text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-950/5 dark:border-white/15 dark:text-zinc-50 dark:hover:bg-white/10"
                   >
                     Save edits
-                  </button>
+                  </SubmitButton>
                 </div>
               </form>
 
               {!draft.approved && (
                 <form action={approve} className="mt-2">
                   <input type="hidden" name="postId" value={draft.id} />
-                  <button
-                    type="submit"
+                  <SubmitButton
+                    pendingLabel="Approving…"
                     className="h-10 rounded-lg bg-zinc-950 px-4 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200"
                   >
                     Approve
-                  </button>
+                  </SubmitButton>
                 </form>
               )}
 
@@ -125,12 +126,12 @@ export default async function DraftsPage() {
                     placeholder="LinkedIn post URL (optional)"
                     className="h-10 flex-1 rounded-lg border border-zinc-950/10 bg-transparent px-3 text-sm text-zinc-950 outline-none placeholder:text-zinc-400 focus:border-zinc-950/30 dark:border-white/15 dark:text-zinc-50 dark:focus:border-white/30"
                   />
-                  <button
-                    type="submit"
+                  <SubmitButton
+                    pendingLabel="Saving…"
                     className="h-10 rounded-lg border border-zinc-950/10 px-4 text-sm font-medium text-zinc-950 transition-colors hover:bg-zinc-950/5 dark:border-white/15 dark:text-zinc-50 dark:hover:bg-white/10"
                   >
                     Mark as posted
-                  </button>
+                  </SubmitButton>
                 </form>
               )}
             </section>

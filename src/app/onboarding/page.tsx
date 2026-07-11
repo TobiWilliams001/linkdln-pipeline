@@ -5,6 +5,7 @@ import { getClientById, updateClientOnboarding } from "@/lib/clients";
 import { uploadVoiceNote } from "@/lib/blob";
 import { transcribeAudio } from "@/lib/transcribe";
 import { signOut } from "@/lib/auth";
+import { SubmitButton } from "@/components/submit-button";
 
 function parseLines(value: FormDataEntryValue | null) {
   if (typeof value !== "string") return [];
@@ -242,12 +243,12 @@ export default async function OnboardingPage() {
             </label>
           </div>
 
-          <button
-            type="submit"
+          <SubmitButton
+            pendingLabel="Saving…"
             className="h-11 self-start rounded-lg bg-zinc-950 px-6 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200"
           >
             Save and continue
-          </button>
+          </SubmitButton>
         </form>
       </main>
     </div>
