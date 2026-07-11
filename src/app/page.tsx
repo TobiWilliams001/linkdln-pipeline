@@ -7,7 +7,7 @@ const highlights = ["Written in your voice", "No blank page", "Ready in minutes"
 export default async function Home() {
   const session = await auth();
   if (session?.user) {
-    redirect(session.user.role === "ADMIN" ? "/admin" : "/dashboard");
+    redirect("/dashboard");
   }
 
   return (
@@ -31,14 +31,14 @@ export default async function Home() {
 
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center gap-7 px-6 pb-32 text-center">
         <span className="w-fit rounded-full bg-zinc-950/5 px-3 py-1 text-xs font-medium uppercase tracking-wide text-zinc-600 dark:bg-white/10 dark:text-zinc-400">
-          For agencies, not just founders
+          No ghostwriter, no blank page
         </span>
         <h1 className="max-w-2xl text-5xl font-semibold leading-[1.1] tracking-tight text-zinc-950 sm:text-6xl dark:text-zinc-50">
           Turn ten minutes a week into a month of LinkedIn content.
         </h1>
         <p className="max-w-xl text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-          Ready-to-post drafts, written in your voice, delivered every week —
-          no writer&apos;s block, no scrambling for what to post.
+          Ready-to-post drafts, written in your voice, delivered on your
+          schedule — no writer&apos;s block, no scrambling for what to post.
         </p>
 
         <div className="mt-1 flex flex-wrap justify-center gap-2">
@@ -56,7 +56,7 @@ export default async function Home() {
           href="/login"
           className="mt-3 inline-flex h-12 w-fit items-center justify-center rounded-full bg-zinc-950 px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200"
         >
-          Sign in to your workspace
+          Get started
         </Link>
       </main>
 
