@@ -67,6 +67,8 @@ export default async function OnboardingPage() {
     await signOut({ redirectTo: "/" });
   }
 
+  const isEditing = Boolean(client.voiceProfile);
+
   const opinionsValue = Array.isArray(client.strongOpinions)
     ? (client.strongOpinions as string[]).join("\n")
     : "";
@@ -103,12 +105,21 @@ export default async function OnboardingPage() {
       </header>
 
       <main className="mx-auto max-w-2xl px-6 py-12">
+        {isEditing && (
+          <Link
+            href="/dashboard"
+            className="mb-6 inline-block text-sm text-zinc-500 transition-colors hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
+          >
+            &larr; Back to dashboard
+          </Link>
+        )}
         <h1 className="mb-1 text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
-          Set up your profile
+          {isEditing ? "Edit your profile" : "Set up your profile"}
         </h1>
         <p className="mb-8 text-sm text-zinc-500 dark:text-zinc-400">
-          One-time setup so drafts sound like you, not a generic AI. Takes
-          about ten minutes — you can always come back and edit it later.
+          {isEditing
+            ? "Update your voice, beliefs, results, or check-in cadence anytime."
+            : "One-time setup so drafts sound like you, not a generic AI. Takes about ten minutes."}
         </p>
 
         <form action={save} className="flex flex-col gap-6">
