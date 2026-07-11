@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { isoWeek } from "@/lib/isoWeek";
+import { isoWeek, isCheckInWeek } from "@/lib/isoWeek";
 import { z } from "zod";
 
 const submitSchema = z.object({
@@ -39,13 +39,17 @@ export async function getClientsMissingSubmission(now: Date = new Date()) {
   const { year, weekNumber } = isoWeek(now);
 
   const clients = await db.client.findMany({
+    where: { voiceProfile: { not: null } },
     include: {
-      users: { where: { role: "CLIENT" } },
+      users: true,
       weeklyInputs: { where: { year, weekNumber } },
     },
   });
 
   return clients.filter(
-    (client) => client.weeklyInputs.length === 0 && client.users.length > 0,
+    (client) =>
+      isCheckInWeek(client.checkInFrequency, weekNumber) &&
+      client.weeklyInputs.length === 0 &&
+      client.users.length > 0,
   );
 }
