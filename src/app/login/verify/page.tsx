@@ -20,8 +20,8 @@ export default function VerifyRequestPage() {
           Check your email
         </h1>
         <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-          If an account exists for that address, a sign-in link is on its
-          way. Click it to continue - you can close this tab.
+          A sign-in link is on its way. Click it to continue - you can close
+          this tab.
         </p>
       </main>
     </div>

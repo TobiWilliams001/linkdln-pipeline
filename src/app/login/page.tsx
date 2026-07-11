@@ -26,8 +26,8 @@ export default function LoginPage() {
             Sign in
           </h1>
           <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-            Enter your email. If your account is set up, we&apos;ll send you a
-            sign-in link.
+            Enter your email and we&apos;ll send you a sign-in link. New here?
+            This creates your workspace automatically.
           </p>
         </div>
         <form action={sendMagicLink} className="flex flex-col gap-3">
