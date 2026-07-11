@@ -37,8 +37,8 @@ export default async function Home() {
           Turn ten minutes a week into a month of LinkedIn content.
         </h1>
         <p className="max-w-xl text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-          Ready-to-post drafts written in your voice — no ghostwriter on call,
-          no blank page.
+          Ready-to-post drafts, written in your voice, delivered every week —
+          no writer's block, no scrambling for what to post.
         </p>
 
         <div className="mt-1 flex flex-wrap justify-center gap-2">
