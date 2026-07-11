@@ -4,6 +4,24 @@ import { auth } from "@/lib/auth";
 
 const highlights = ["Written in your voice", "No blank page", "Ready in minutes"];
 
+const steps = [
+  {
+    label: "01",
+    title: "Share what's on your mind",
+    body: "A few quick prompts, on your schedule. Type it out or just talk — whatever's faster.",
+  },
+  {
+    label: "02",
+    title: "Get drafts back",
+    body: "Ready-to-post content, written in your voice — not generic AI copy.",
+  },
+  {
+    label: "03",
+    title: "Approve and post",
+    body: "Tweak anything that's off, approve it, and post it yourself when you're ready.",
+  },
+];
+
 export default async function Home() {
   const session = await auth();
   if (session?.user) {
@@ -29,7 +47,7 @@ export default async function Home() {
         </Link>
       </header>
 
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center gap-7 px-6 pb-32 text-center">
+      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center gap-7 px-6 pt-12 pb-20 text-center">
         <span className="w-fit rounded-full bg-zinc-950/5 px-3 py-1 text-xs font-medium uppercase tracking-wide text-zinc-600 dark:bg-white/10 dark:text-zinc-400">
           No ghostwriter, no blank page
         </span>
@@ -59,6 +77,24 @@ export default async function Home() {
           Get started
         </Link>
       </main>
+
+      <section className="mx-auto w-full max-w-5xl border-t border-zinc-950/10 px-6 py-16 dark:border-white/10">
+        <div className="grid gap-10 sm:grid-cols-3">
+          {steps.map((step) => (
+            <div key={step.label} className="flex flex-col gap-3 text-left">
+              <span className="text-sm font-semibold text-zinc-400 dark:text-zinc-600">
+                {step.label}
+              </span>
+              <h2 className="text-lg font-semibold text-zinc-950 dark:text-zinc-50">
+                {step.title}
+              </h2>
+              <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+                {step.body}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <footer className="mx-auto w-full max-w-5xl border-t border-zinc-950/10 px-6 py-8 text-xs text-zinc-500 dark:border-white/10 dark:text-zinc-500">
         &copy; {new Date().getFullYear()} LinkedIn Content Pipeline
