@@ -17,6 +17,12 @@ enum Role {
   CLIENT
 }
 
+enum CheckInFrequency {
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+}
+
 enum ContentType {
   INSIGHT
   STORY
@@ -27,18 +33,19 @@ enum ContentType {
 }
 
 model Client {
-  id              String   @id @default(cuid())
-  slug            String   @unique
-  name            String
-  voiceProfile    String?
-  coreBelief      String?
-  icpPain         String?
-  originStory     String?
-  clientResults   Json?
-  strongOpinions  Json?
-  contentExamples String[]
-  postingCadence  Int      @default(4)
-  createdAt       DateTime @default(now())
+  id               String           @id @default(cuid())
+  slug             String           @unique
+  name             String
+  voiceProfile     String?
+  coreBelief       String?
+  icpPain          String?
+  originStory      String?
+  clientResults    Json?
+  strongOpinions   Json?
+  contentExamples  String[]
+  postingCadence   Int              @default(4)
+  checkInFrequency CheckInFrequency @default(WEEKLY)
+  createdAt        DateTime         @default(now())
 
   users        User[]
   weeklyInputs WeeklyInput[]
