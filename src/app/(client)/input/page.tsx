@@ -52,7 +52,7 @@ export default async function WeeklyInputPage() {
   const hintClass = "text-xs text-zinc-500 dark:text-zinc-400";
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-12">
+    <main className="mx-auto max-w-2xl px-10 py-12">
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
         This week&apos;s input
       </h1>

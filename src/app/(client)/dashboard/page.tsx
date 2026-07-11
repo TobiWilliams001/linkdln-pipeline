@@ -24,7 +24,7 @@ export default async function DashboardPage() {
     await getDashboardStats(clientId);
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-12">
+    <main className="mx-auto max-w-2xl px-10 py-12">
       <h1 className="mb-8 text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
         This month
       </h1>

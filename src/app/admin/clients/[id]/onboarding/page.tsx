@@ -70,7 +70,7 @@ export default async function ClientOnboardingPage({
   const hintClass = "text-xs text-zinc-500 dark:text-zinc-400";
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-12">
+    <main className="mx-auto max-w-2xl px-10 py-12">
       <Link
         href={`/admin/clients/${id}`}
         className="mb-6 inline-block text-sm text-zinc-500 transition-colors hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
