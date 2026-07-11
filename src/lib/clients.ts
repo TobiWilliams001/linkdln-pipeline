@@ -9,23 +9,8 @@ function slugify(name: string) {
     .replace(/(^-|-$)/g, "");
 }
 
-export async function listClients() {
-  return db.client.findMany({
-    orderBy: { createdAt: "desc" },
-    include: {
-      _count: { select: { weeklyInputs: true, contentPosts: true, users: true } },
-    },
-  });
-}
-
-const createClientSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-});
-
-export async function createClient(input: unknown) {
-  const { name } = createClientSchema.parse(input);
-
-  const baseSlug = slugify(name);
+export async function provisionClientForEmail(email: string) {
+  const baseSlug = slugify(email.split("@")[0]) || "client";
   let slug = baseSlug;
   let suffix = 1;
   // eslint-disable-next-line no-await-in-loop
@@ -34,21 +19,16 @@ export async function createClient(input: unknown) {
     slug = `${baseSlug}-${suffix}`;
   }
 
-  return db.client.create({ data: { name, slug } });
+  // name defaults to the email; the client renames themselves during onboarding.
+  return db.client.create({ data: { name: email, slug } });
 }
 
-export async function getClient(id: string) {
-  return db.client.findUnique({
-    where: { id },
-    include: {
-      users: true,
-      weeklyInputs: { orderBy: { submittedAt: "desc" }, take: 5 },
-      contentPosts: { orderBy: { createdAt: "desc" }, take: 10 },
-    },
-  });
+export async function getClientById(id: string) {
+  return db.client.findUnique({ where: { id } });
 }
 
 const onboardingSchema = z.object({
+  name: z.string().min(1).optional(),
   voiceProfile: z.string().optional(),
   coreBelief: z.string().optional(),
   icpPain: z.string().optional(),
@@ -58,24 +38,10 @@ const onboardingSchema = z.object({
     .optional(),
   strongOpinions: z.array(z.string()).optional(),
   postingCadence: z.coerce.number().int().min(1).max(14).optional(),
+  checkInFrequency: z.enum(["WEEKLY", "BIWEEKLY", "MONTHLY"]).optional(),
 });
 
 export async function updateClientOnboarding(id: string, input: unknown) {
   const data = onboardingSchema.parse(input);
   return db.client.update({ where: { id }, data });
-}
-
-const inviteSchema = z.object({
-  email: z.string().email(),
-});
-
-export async function inviteClientUser(clientId: string, input: unknown) {
-  const { email } = inviteSchema.parse(input);
-  // upsert: if the admin re-invites the same email, it just re-links them
-  // to this client rather than erroring on a duplicate.
-  return db.user.upsert({
-    where: { email },
-    update: { role: "CLIENT", clientId },
-    create: { email, role: "CLIENT", clientId },
-  });
 }

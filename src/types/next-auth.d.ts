@@ -9,6 +9,11 @@ declare module "next-auth" {
       clientId: string | null;
     };
   }
+
+  interface User {
+    role: Role;
+    clientId: string | null;
+  }
 }
 
 declare module "@auth/core/adapters" {
