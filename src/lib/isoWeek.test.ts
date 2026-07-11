@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isoWeek } from "@/lib/isoWeek";
+import { isoWeek, isCheckInWeek } from "@/lib/isoWeek";
 
 describe("isoWeek", () => {
   it("returns week 1 for a date in early January", () => {
@@ -31,5 +31,23 @@ describe("isoWeek", () => {
       year: 2026,
       weekNumber: 53,
     });
+  });
+});
+
+describe("isCheckInWeek", () => {
+  it("is always true for weekly", () => {
+    expect(isCheckInWeek("WEEKLY", 1)).toBe(true);
+    expect(isCheckInWeek("WEEKLY", 2)).toBe(true);
+  });
+
+  it("is only true on even weeks for biweekly", () => {
+    expect(isCheckInWeek("BIWEEKLY", 1)).toBe(false);
+    expect(isCheckInWeek("BIWEEKLY", 2)).toBe(true);
+  });
+
+  it("is only true once every four weeks for monthly", () => {
+    expect(isCheckInWeek("MONTHLY", 1)).toBe(true);
+    expect(isCheckInWeek("MONTHLY", 2)).toBe(false);
+    expect(isCheckInWeek("MONTHLY", 5)).toBe(true);
   });
 });

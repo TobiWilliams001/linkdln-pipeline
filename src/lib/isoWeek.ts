@@ -10,3 +10,15 @@ export function isoWeek(date: Date): { year: number; weekNumber: number } {
   );
   return { year: d.getUTCFullYear(), weekNumber };
 }
+
+// Whether the given ISO week is a check-in week for a client on this
+// cadence. Biweekly/monthly are approximate - ISO weeks don't align exactly
+// with calendar months - but close enough for a reminder cadence.
+export function isCheckInWeek(
+  frequency: "WEEKLY" | "BIWEEKLY" | "MONTHLY",
+  weekNumber: number,
+): boolean {
+  if (frequency === "BIWEEKLY") return weekNumber % 2 === 0;
+  if (frequency === "MONTHLY") return weekNumber % 4 === 1;
+  return true;
+}
