@@ -12,11 +12,16 @@ const CONTENT_TYPE_LABELS: Record<string, string> = {
   OBSERVATION: "Observation",
 };
 
-export default async function DraftsPage() {
+export default async function DraftsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ generated?: string }>;
+}) {
   const session = await requireClient();
   const clientId = session.user.clientId as string;
 
   const drafts = await getCurrentWeekDrafts(clientId);
+  const { generated } = await searchParams;
 
   async function save(formData: FormData) {
     "use server";
@@ -48,6 +53,13 @@ export default async function DraftsPage() {
 
   return (
     <main className="mx-auto max-w-2xl px-10 py-12">
+      {generated === "1" && drafts.length > 0 && (
+        <div className="mb-6 flex items-center gap-2 rounded-lg bg-emerald-600/10 px-4 py-3 text-sm font-medium text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-400">
+          <span>✓</span>
+          {drafts.length} draft{drafts.length === 1 ? "" : "s"} generated from
+          this week&apos;s input.
+        </div>
+      )}
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
         This week&apos;s drafts
       </h1>

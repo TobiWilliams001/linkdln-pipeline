@@ -41,7 +41,7 @@ export default async function WeeklyInputPage() {
     const alreadyGenerated = await hasDraftsForWeeklyInput(weeklyInput.id);
     if (!alreadyGenerated) {
       await generateContentForWeeklyInput(weeklyInput.id);
-      redirect("/drafts");
+      redirect("/drafts?generated=1");
     }
 
     redirect("/input?saved=1");
