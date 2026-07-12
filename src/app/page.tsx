@@ -93,6 +93,40 @@ export default async function Home() {
         </div>
       </section>
 
+      <section className="mx-auto w-full max-w-5xl border-t border-zinc-950/10 px-6 py-16 dark:border-white/10">
+        <h2 className="mb-8 text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+          What a draft actually looks like
+        </h2>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <div className="rounded-xl border border-dashed border-zinc-950/15 p-5 dark:border-white/15">
+            <span className="mb-3 block text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:text-zinc-600">
+              What you type
+            </span>
+            <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+              &ldquo;A client asked why their onboarding was losing people.
+              Turned out nobody on the team had actually watched a new user
+              try it in six months.&rdquo;
+            </p>
+          </div>
+          <div className="rounded-xl border border-zinc-950/10 bg-zinc-950/2 p-5 dark:border-white/10 dark:bg-white/3">
+            <span className="mb-3 block text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:text-zinc-600">
+              What comes back
+            </span>
+            <p className="whitespace-pre-line text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+              {`Nobody on the team had watched a new user go through onboarding in six months.
+
+Not because they didn't care. The dashboard said conversion was "fine," and fine doesn't get anyone to open a laptop and watch a stranger struggle.
+
+We sat in on three sessions. Two people gave up before finishing signup — not because the product was bad, but because step three asked for information nobody needed yet.
+
+The dashboard was never going to show that. Only watching would.
+
+What's the last thing in your product nobody's actually watched a stranger use?`}
+            </p>
+          </div>
+        </div>
+      </section>
+
       <footer className="mx-auto w-full max-w-5xl border-t border-zinc-950/10 px-6 py-8 text-xs text-zinc-500 dark:border-white/10 dark:text-zinc-500">
         &copy; {new Date().getFullYear()} LinkedIn Content Pipeline
       </footer>
