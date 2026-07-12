@@ -127,7 +127,7 @@ What's the last thing in your product nobody's actually watched a stranger use?`
         </div>
       </section>
 
-      <footer className="mx-auto w-full max-w-5xl border-t border-zinc-950/10 px-6 py-8 text-xs text-zinc-500 dark:border-white/10 dark:text-zinc-500">
+      <footer className="mx-auto w-full max-w-5xl border-t border-zinc-950/10 px-6 py-8 text-center text-xs text-zinc-500 dark:border-white/10 dark:text-zinc-500">
         &copy; {new Date().getFullYear()} LinkedIn Content Pipeline
       </footer>
     </div>
