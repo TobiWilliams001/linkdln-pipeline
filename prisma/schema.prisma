@@ -135,5 +135,8 @@ model ContentPost {
   posted         Boolean     @default(false)
   postDate       DateTime?
   linkedinUrl    String?
+  impressions    Int?
+  likes          Int?
+  comments       Int?
   createdAt      DateTime    @default(now())
 }
