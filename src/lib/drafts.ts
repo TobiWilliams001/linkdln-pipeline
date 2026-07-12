@@ -1,11 +1,19 @@
 import { db } from "@/lib/db";
-import { isoWeek } from "@/lib/isoWeek";
 import { z } from "zod";
 
-export async function getCurrentWeekDrafts(clientId: string, now: Date = new Date()) {
-  const { year, weekNumber } = isoWeek(now);
+// Drafts for the most recent check-in, not strictly "this calendar week" -
+// with biweekly/monthly cadences the ISO week can roll over before a client
+// gets around to reviewing, which would otherwise make their still-pending
+// drafts disappear from this page entirely.
+export async function getLatestDrafts(clientId: string) {
+  const latestInput = await db.weeklyInput.findFirst({
+    where: { clientId },
+    orderBy: { submittedAt: "desc" },
+  });
+  if (!latestInput) return [];
+
   return db.contentPost.findMany({
-    where: { clientId, year, weekNumber },
+    where: { clientId, weeklyInputId: latestInput.id },
     orderBy: { createdAt: "asc" },
   });
 }
@@ -54,4 +62,24 @@ export async function markPosted(postId: string, clientId: string, input: unknow
       linkedinUrl: linkedinUrl || undefined,
     },
   });
+}
+
+const logPerformanceSchema = z.object({
+  impressions: z.coerce.number().int().min(0).optional(),
+  likes: z.coerce.number().int().min(0).optional(),
+  comments: z.coerce.number().int().min(0).optional(),
+});
+
+export async function logPerformance(postId: string, clientId: string, input: unknown) {
+  const data = logPerformanceSchema.parse(input);
+
+  const post = await db.contentPost.findUnique({ where: { id: postId } });
+  if (!post || post.clientId !== clientId) {
+    throw new Error("Draft not found for this client");
+  }
+  if (!post.posted) {
+    throw new Error("Can only log performance for a posted draft");
+  }
+
+  return db.contentPost.update({ where: { id: postId }, data });
 }
