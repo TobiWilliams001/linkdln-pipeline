@@ -5,6 +5,7 @@ import { getClientById, updateClientOnboarding } from "@/lib/clients";
 import { uploadVoiceNote } from "@/lib/blob";
 import { transcribeAudio } from "@/lib/transcribe";
 import { signOut } from "@/lib/auth";
+import { extractProfileFromFreeform } from "@/lib/extractProfile";
 import { SubmitButton } from "@/components/submit-button";
 
 function parseLines(value: FormDataEntryValue | null) {
@@ -21,10 +22,15 @@ const FREQUENCIES = [
   { value: "MONTHLY", label: "Once a month" },
 ] as const;
 
-export default async function OnboardingPage() {
+export default async function OnboardingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ drafted?: string }>;
+}) {
   const session = await requireClient();
   const client = await getClientById(session.user.clientId as string);
   if (!client) redirect("/login");
+  const { drafted } = await searchParams;
 
   async function save(formData: FormData) {
     "use server";
@@ -66,6 +72,34 @@ export default async function OnboardingPage() {
   async function logout() {
     "use server";
     await signOut({ redirectTo: "/" });
+  }
+
+  async function generateProfile(formData: FormData) {
+    "use server";
+
+    let text = formData.get("freeform")?.toString() ?? "";
+    const voiceNote = formData.get("freeformVoiceNote");
+    if (voiceNote instanceof File && voiceNote.size > 0) {
+      const voiceNoteUrl = await uploadVoiceNote(voiceNote);
+      const transcript = await transcribeAudio(voiceNoteUrl);
+      text = text || transcript;
+    }
+    if (!text.trim()) {
+      redirect("/onboarding");
+    }
+
+    const extracted = await extractProfileFromFreeform(text);
+    const clientId = session.user.clientId as string;
+
+    await updateClientOnboarding(clientId, {
+      coreBelief: extracted.coreBelief,
+      icpPain: extracted.icpPain,
+      originStory: extracted.originStory,
+      strongOpinions: extracted.strongOpinions,
+      clientResults: extracted.clientResults,
+    });
+
+    redirect("/onboarding?drafted=1");
   }
 
   const isEditing = Boolean(client.voiceProfile);
@@ -122,6 +156,46 @@ export default async function OnboardingPage() {
             ? "Update your voice, beliefs, results, or check-in cadence anytime."
             : "One-time setup so drafts sound like you, not a generic AI. Takes about ten minutes."}
         </p>
+
+        {!isEditing && (
+          <div className="mb-8 rounded-xl border border-zinc-950/10 bg-zinc-950/2 p-5 dark:border-white/10 dark:bg-white/3">
+            {drafted === "1" && (
+              <p className="mb-3 text-sm font-medium text-emerald-700 dark:text-emerald-400">
+                ✓ Drafted from what you shared below — review and edit it in
+                the form, then save.
+              </p>
+            )}
+            <h2 className="mb-1 text-sm font-semibold text-zinc-950 dark:text-zinc-50">
+              Don&apos;t want to fill in six fields cold?
+            </h2>
+            <p className="mb-3 text-xs text-zinc-500 dark:text-zinc-400">
+              Describe your work in a paragraph or two — or just record
+              yourself talking about it — and we&apos;ll draft your core
+              belief, ideal client, origin story, opinions, and results for
+              you to review below.
+            </p>
+            <form action={generateProfile} className="flex flex-col gap-3">
+              <textarea
+                name="freeform"
+                rows={4}
+                placeholder="e.g. I help early-stage startups turn ambitious product ideas into reliable systems. Most failures aren't technical — teams solve the wrong problem..."
+                className={inputClass}
+              />
+              <input
+                type="file"
+                name="freeformVoiceNote"
+                accept="audio/*"
+                className="text-sm text-zinc-600 file:mr-3 file:rounded-lg file:border-0 file:bg-zinc-950/5 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-zinc-950 dark:text-zinc-400 dark:file:bg-white/10 dark:file:text-zinc-50"
+              />
+              <SubmitButton
+                pendingLabel="Drafting your profile…"
+                className="h-10 w-fit rounded-lg bg-zinc-950 px-4 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200"
+              >
+                Draft my profile
+              </SubmitButton>
+            </form>
+          </div>
+        )}
 
         <form action={save} className="flex flex-col gap-6">
           <label className="flex flex-col gap-1.5">
