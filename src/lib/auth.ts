@@ -19,27 +19,28 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async signIn({ user }) {
-      if (!user.email || !user.id) return false;
-      // Open signup: the adapter already created a bare User row for any new
-      // email. First sign-in, give them their own Client to fill in via the
-      // self-serve onboarding form.
-      if (!user.clientId) {
-        const client = await provisionClientForEmail(user.email);
-        await db.user.update({
-          where: { id: user.id },
-          data: { clientId: client.id },
-        });
-      }
-      return true;
-    },
     async session({ session, user }) {
-      // `user` can be stale relative to the clientId update just made in
-      // signIn, so re-fetch to make sure the session always has it.
+      // `user` can be stale relative to a clientId update made moments
+      // earlier (e.g. in the createUser event below), so re-fetch to make
+      // sure the session always reflects the current row.
       const fresh = await db.user.findUnique({ where: { id: user.id } });
       session.user.role = fresh?.role ?? user.role;
       session.user.clientId = fresh?.clientId ?? user.clientId;
       return session;
+    },
+  },
+  events: {
+    // Fires once, right after the adapter persists a brand-new User row -
+    // unlike the signIn callback, which runs BEFORE that row exists for a
+    // first-time email (calling db.user.update there fails with "record
+    // not found" since there's nothing to update yet).
+    async createUser({ user }) {
+      if (!user.email || !user.id) return;
+      const client = await provisionClientForEmail(user.email);
+      await db.user.update({
+        where: { id: user.id },
+        data: { clientId: client.id },
+      });
     },
   },
 });
