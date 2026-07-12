@@ -20,8 +20,17 @@ export default async function DashboardPage() {
   const session = await requireClient();
   const clientId = session.user.clientId as string;
 
-  const { posts, totalCount, approvedCount, postedCount } =
-    await getDashboardStats(clientId);
+  const {
+    posts,
+    totalCount,
+    approvedCount,
+    postedCount,
+    totalImpressions,
+    totalLikes,
+    totalComments,
+  } = await getDashboardStats(clientId);
+
+  const hasPerformanceData = totalImpressions + totalLikes + totalComments > 0;
 
   return (
     <main className="mx-auto max-w-2xl px-10 py-12">
@@ -49,6 +58,34 @@ export default async function DashboardPage() {
           <div className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Posted</div>
         </div>
       </div>
+
+      {hasPerformanceData && (
+        <div className="mb-10">
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            Performance this month
+          </h2>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="rounded-xl border border-zinc-950/10 p-4 text-center dark:border-white/10">
+              <div className="text-xl font-semibold text-zinc-950 dark:text-zinc-50">
+                {totalImpressions.toLocaleString()}
+              </div>
+              <div className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Impressions</div>
+            </div>
+            <div className="rounded-xl border border-zinc-950/10 p-4 text-center dark:border-white/10">
+              <div className="text-xl font-semibold text-zinc-950 dark:text-zinc-50">
+                {totalLikes.toLocaleString()}
+              </div>
+              <div className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Likes</div>
+            </div>
+            <div className="rounded-xl border border-zinc-950/10 p-4 text-center dark:border-white/10">
+              <div className="text-xl font-semibold text-zinc-950 dark:text-zinc-50">
+                {totalComments.toLocaleString()}
+              </div>
+              <div className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Comments</div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {posts.length === 0 ? (
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
