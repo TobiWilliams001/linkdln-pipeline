@@ -18,6 +18,19 @@ export async function submitWeeklyInput(
   const data = submitSchema.parse(input);
   const { year, weekNumber } = isoWeek(now);
 
+  const existing = await db.weeklyInput.findUnique({
+    where: { clientId_weekNumber_year: { clientId, weekNumber, year } },
+  });
+
+  // Only guard against starting a NEW check-in past the plan length -
+  // editing an already-submitted one should always be allowed.
+  if (!existing) {
+    const { isComplete } = await getPlanStatus(clientId);
+    if (isComplete) {
+      throw new Error("This plan's check-ins are already complete");
+    }
+  }
+
   return db.weeklyInput.upsert({
     where: { clientId_weekNumber_year: { clientId, weekNumber, year } },
     update: data,
@@ -33,6 +46,18 @@ export async function getCurrentWeekInput(
   return db.weeklyInput.findUnique({
     where: { clientId_weekNumber_year: { clientId, weekNumber, year } },
   });
+}
+
+export async function getPlanStatus(clientId: string) {
+  const client = await db.client.findUniqueOrThrow({ where: { id: clientId } });
+  const completed = await db.weeklyInput.count({ where: { clientId } });
+  const total = client.planWeeks;
+
+  return {
+    completed,
+    total,
+    isComplete: total !== null && completed >= total,
+  };
 }
 
 export async function getClientsMissingSubmission(now: Date = new Date()) {
