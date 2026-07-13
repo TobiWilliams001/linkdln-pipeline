@@ -39,6 +39,13 @@ const onboardingSchema = z.object({
   strongOpinions: z.array(z.string()).optional(),
   postingCadence: z.coerce.number().int().min(1).max(14).optional(),
   checkInFrequency: z.enum(["WEEKLY", "BIWEEKLY", "MONTHLY"]).optional(),
+  // Total number of check-ins the plan covers. Empty/null means ongoing,
+  // no end date - preprocess so an empty form field clears it rather than
+  // coercing to 0 (which would fail the min(1) check below).
+  planWeeks: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? null : v),
+    z.coerce.number().int().min(1).max(104).nullable().optional(),
+  ),
 });
 
 export async function updateClientOnboarding(id: string, input: unknown) {
