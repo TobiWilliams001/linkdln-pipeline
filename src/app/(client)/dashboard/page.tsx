@@ -1,5 +1,6 @@
 import { requireClient } from "@/lib/authz";
 import { getDashboardStats } from "@/lib/dashboard";
+import { getPlanStatus } from "@/lib/weeklyInputs";
 
 const CONTENT_TYPE_LABELS: Record<string, string> = {
   INSIGHT: "Insight",
@@ -31,12 +32,21 @@ export default async function DashboardPage() {
   } = await getDashboardStats(clientId);
 
   const hasPerformanceData = totalImpressions + totalLikes + totalComments > 0;
+  const planStatus = await getPlanStatus(clientId);
 
   return (
     <main className="mx-auto max-w-2xl px-10 py-12">
-      <h1 className="mb-8 text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
-        This month
-      </h1>
+      <div className="mb-8 flex items-center justify-between">
+        <h1 className="text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
+          This month
+        </h1>
+        {planStatus.total !== null && (
+          <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+            Check-in {Math.min(planStatus.completed, planStatus.total)} of{" "}
+            {planStatus.total}
+          </span>
+        )}
+      </div>
 
       <div className="mb-10 grid grid-cols-3 gap-3">
         <div className="rounded-xl bg-zinc-950/3 p-5 text-center dark:bg-white/4">
