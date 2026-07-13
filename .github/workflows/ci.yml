@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: linkedin_pipeline
+          POSTGRES_PASSWORD: linkedin_pipeline
+          POSTGRES_DB: linkedin_pipeline
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://linkedin_pipeline:linkedin_pipeline@localhost:5432/linkedin_pipeline?schema=public
+      SHADOW_DATABASE_URL: postgresql://linkedin_pipeline:linkedin_pipeline@localhost:5432/linkedin_pipeline_shadow?schema=public
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Create shadow database
+        run: PGPASSWORD=linkedin_pipeline psql -h localhost -U linkedin_pipeline -d linkedin_pipeline -c "CREATE DATABASE linkedin_pipeline_shadow;"
+
+      # Catches "schema.prisma was edited but no migration file was
+      # generated for it" - the exact class of bug that broke production
+      # twice this week (missing checkInFrequency, missing performance
+      # columns). Fails the build instead of a live user finding out.
+      - name: Check schema and migrations are in sync
+        run: npx prisma migrate diff --from-migrations prisma/migrations --to-schema prisma/schema.prisma --exit-code
+
+      # Applies every migration against a brand-new database, same as
+      # production would get on deploy. Catches broken/invalid SQL before
+      # it ever reaches Neon.
+      - name: Apply migrations to a clean database
+        run: npx prisma migrate deploy
+
+      - run: npx prisma generate
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npx eslint src
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: npx next build
+        env:
+          # Dummy values so build-time code that reads these env vars
+          # doesn't throw - no real network calls happen during a build.
+          AUTH_SECRET: ci-placeholder-secret
+          OPENROUTER_API_KEY: ci-placeholder
+          OPENAI_API_KEY: ci-placeholder
+          RESEND_API_KEY: ci-placeholder
+          RESEND_FROM_EMAIL: ci@example.com
+          BLOB_READ_WRITE_TOKEN: ci-placeholder
+          CRON_SECRET: ci-placeholder
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
