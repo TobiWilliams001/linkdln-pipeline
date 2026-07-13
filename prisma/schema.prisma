@@ -45,6 +45,8 @@ model Client {
   contentExamples  String[]
   postingCadence   Int              @default(4)
   checkInFrequency CheckInFrequency @default(WEEKLY)
+  // Total number of check-ins the plan covers. Null = ongoing, no end date.
+  planWeeks        Int?
   createdAt        DateTime         @default(now())
 
   users        User[]
