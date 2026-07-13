@@ -7,6 +7,7 @@ import { transcribeAudio } from "@/lib/transcribe";
 import { signOut } from "@/lib/auth";
 import { extractProfileFromFreeform } from "@/lib/extractProfile";
 import { SubmitButton } from "@/components/submit-button";
+import { PlanFields } from "@/components/plan-fields";
 
 function parseLines(value: FormDataEntryValue | null) {
   if (typeof value !== "string") return [];
@@ -15,12 +16,6 @@ function parseLines(value: FormDataEntryValue | null) {
     .map((line) => line.trim())
     .filter(Boolean);
 }
-
-const FREQUENCIES = [
-  { value: "WEEKLY", label: "Every week" },
-  { value: "BIWEEKLY", label: "Every two weeks" },
-  { value: "MONTHLY", label: "Once a month" },
-] as const;
 
 export default async function OnboardingPage({
   searchParams,
@@ -289,51 +284,14 @@ export default async function OnboardingPage({
             />
           </label>
 
-          <div className="grid grid-cols-2 gap-4">
-            <label className="flex flex-col gap-1.5">
-              <span className={labelClass}>Posts per week</span>
-              <input
-                type="number"
-                name="postingCadence"
-                min={1}
-                max={14}
-                defaultValue={client.postingCadence}
-                className={`h-11 ${inputClass}`}
-              />
-            </label>
-
-            <label className="flex flex-col gap-1.5">
-              <span className={labelClass}>How often you&apos;ll check in</span>
-              <select
-                name="checkInFrequency"
-                defaultValue={client.checkInFrequency}
-                className={`h-11 ${inputClass}`}
-              >
-                {FREQUENCIES.map((freq) => (
-                  <option key={freq.value} value={freq.value}>
-                    {freq.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          <label className="flex flex-col gap-1.5">
-            <span className={labelClass}>Plan length (in check-ins)</span>
-            <span className={hintClass}>
-              e.g. 8 check-ins at 3 posts/week ≈ 2 months of content. Leave
-              blank to keep going indefinitely.
-            </span>
-            <input
-              type="number"
-              name="planWeeks"
-              min={1}
-              max={104}
-              placeholder="Ongoing"
-              defaultValue={client.planWeeks ?? ""}
-              className={`h-11 w-32 ${inputClass}`}
-            />
-          </label>
+          <PlanFields
+            defaultPostingCadence={client.postingCadence}
+            defaultCheckInFrequency={client.checkInFrequency}
+            defaultPlanWeeks={client.planWeeks}
+            inputClass={inputClass}
+            labelClass={labelClass}
+            hintClass={hintClass}
+          />
 
           <SubmitButton
             pendingLabel="Saving…"
