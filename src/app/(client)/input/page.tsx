@@ -1,6 +1,11 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireClient } from "@/lib/authz";
-import { getCurrentWeekInput, submitWeeklyInput } from "@/lib/weeklyInputs";
+import {
+  getCurrentWeekInput,
+  getPlanStatus,
+  submitWeeklyInput,
+} from "@/lib/weeklyInputs";
 import { hasDraftsForWeeklyInput } from "@/lib/drafts";
 import { generateContentForWeeklyInput } from "@/lib/generateContent";
 import { uploadVoiceNote } from "@/lib/blob";
@@ -12,6 +17,7 @@ export default async function WeeklyInputPage() {
   const clientId = session.user.clientId as string;
 
   const existing = await getCurrentWeekInput(clientId);
+  const planStatus = await getPlanStatus(clientId);
 
   async function save(formData: FormData) {
     "use server";
@@ -52,16 +58,38 @@ export default async function WeeklyInputPage() {
   const labelClass = "text-sm font-medium text-zinc-950 dark:text-zinc-50";
   const hintClass = "text-xs text-zinc-500 dark:text-zinc-400";
 
+  const showCompletedState = planStatus.isComplete && !existing;
+
   return (
     <main className="mx-auto max-w-2xl px-10 py-12">
       <h1 className="mb-1 text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
         This week&apos;s input
       </h1>
-      <p className="mb-8 text-sm text-zinc-500 dark:text-zinc-400">
+      <p className="mb-2 text-sm text-zinc-500 dark:text-zinc-400">
         Four quick questions. Takes about 10 minutes - this is the raw
         material for this week&apos;s posts.
       </p>
+      {planStatus.total !== null && (
+        <p className="mb-8 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+          Check-in {Math.min(planStatus.completed + (existing ? 0 : 1), planStatus.total)} of {planStatus.total}
+        </p>
+      )}
 
+      {showCompletedState ? (
+        <div className="rounded-xl border border-zinc-950/10 p-5 dark:border-white/10">
+          <p className="mb-2 text-sm font-medium text-zinc-950 dark:text-zinc-50">
+            You&apos;ve completed all {planStatus.total} check-ins on your
+            current plan.
+          </p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Want more? Head to{" "}
+            <Link href="/onboarding" className="underline">
+              Profile
+            </Link>{" "}
+            and extend your plan length.
+          </p>
+        </div>
+      ) : (
       <form action={save} className="flex flex-col gap-6">
         <label className="flex flex-col gap-1.5">
           <span className={labelClass}>
@@ -128,6 +156,7 @@ export default async function WeeklyInputPage() {
           {existing ? "Update this week's input" : "Submit"}
         </SubmitButton>
       </form>
+      )}
     </main>
   );
 }
