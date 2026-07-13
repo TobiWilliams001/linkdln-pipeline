@@ -64,6 +64,7 @@ export default async function OnboardingPage({
       clientResults,
       postingCadence: formData.get("postingCadence")?.toString() ?? "4",
       checkInFrequency: formData.get("checkInFrequency")?.toString() ?? "WEEKLY",
+      planWeeks: formData.get("planWeeks")?.toString() ?? "",
     });
 
     redirect("/dashboard");
@@ -316,6 +317,23 @@ export default async function OnboardingPage({
               </select>
             </label>
           </div>
+
+          <label className="flex flex-col gap-1.5">
+            <span className={labelClass}>Plan length (in check-ins)</span>
+            <span className={hintClass}>
+              e.g. 8 check-ins at 3 posts/week ≈ 2 months of content. Leave
+              blank to keep going indefinitely.
+            </span>
+            <input
+              type="number"
+              name="planWeeks"
+              min={1}
+              max={104}
+              placeholder="Ongoing"
+              defaultValue={client.planWeeks ?? ""}
+              className={`h-11 w-32 ${inputClass}`}
+            />
+          </label>
 
           <SubmitButton
             pendingLabel="Saving…"
